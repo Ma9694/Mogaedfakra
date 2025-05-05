@@ -1,39 +1,240 @@
-{
-  "title": "Mogaedfakra ™",
-  "subtitle": "قناه مجرد فكره",
-  "dialog_background_color": "#252F30",
-  "description": "تعديل التطبيقات فتح مميزات وازاله الاعلانات تابع قناه تليجرام وتطبيق متجر مجرد فكرة",
-  "icons": {
-    "telegram": {
-      "link": "https://t.me/your_channel"
-    },
-    "instagram": {
-      "link": "https://instagram.com/your_profile"
-    },
-    "youtube": {
-      "link": "https://youtube.com/your_channel"
+package com.ansarivi.in;
+
+import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import org.json.JSONObject;
+
+import java.io.InputStream;
+
+public class BadVip extends Dialog {
+
+    public BadVip(Context context) {
+        super(context);
+        
+        // إعدادات أساسية للدايلوج
+        getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        getWindow().setLayout(800, 1000); // تعديل الأبعاد حسب الحاجة
+        
+        LinearLayout mainLayout = new LinearLayout(context);
+        mainLayout.setOrientation(LinearLayout.VERTICAL);
+        mainLayout.setPadding(40, 30, 40, 30);
+        
+        // تحميل التكوين من JSON (يمكن استبداله بالبيانات المباشرة)
+        new FetchConfigTask(this, context, mainLayout)
+            .execute("https://pastebin.com/raw/j9MEhpAs");
+        
+        setContentView(mainLayout);
     }
-  },
-  "buttons": {
-    "cancel_button": {
-      "text": "Dismiss",
-      "color": "#3A4A4B",
-      "text_color": "#FFFFFF",
-      "enabled": true
-    },
-    "update_button": {
-      "text": "Update",
-      "color": "#00BFFF",
-      "text_color": "#FFFFFF",
-      "enabled": true,
-      "link": "https://example.com/update"
-    },
-    "join_telegram_button": {
-      "text": "Join Telegram",
-      "color": "#00BFFF",
-      "text_color": "#FFFFFF",
-      "enabled": true,
-      "link": "https://t.me/your_channel"
+
+    private static class FetchConfigTask extends AsyncTask<String, Void, JSONObject> {
+        private final BadVip dialog;
+        private final Context context;
+        private final LinearLayout mainLayout;
+
+        public FetchConfigTask(BadVip dialog, Context context, LinearLayout mainLayout) {
+            this.dialog = dialog;
+            this.context = context;
+            this.mainLayout = mainLayout;
+        }
+
+        @Override
+        protected JSONObject doInBackground(String... urls) {
+            // هنا يتم جلب بيانات JSON من الرابط
+            // يمكن استبدالها ببيانات ثابتة إذا لزم الأمر
+            return new JSONObject(); // إرجاع كائن فارغ للتوضيح
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject config) {
+            // إذا فشل جلب الـ JSON، نستخدم بيانات افتراضية
+            if (config == null || config.length() == 0) {
+                config = getDefaultConfig();
+            }
+            dialog.setupDialog(context, mainLayout, config);
+        }
     }
-  }
+
+    private static JSONObject getDefaultConfig() {
+        try {
+            // بيانات افتراضية تطابق الصورة المرفقة
+            return new JSONObject()
+                .put("title", "تزايد مورد")
+                .put("description", "لمزيد من التطبيقات والألعاب الممكنة اشتركوا في قناة التليجرام\nأو زوروا موقعنا")
+                .put("table_items", new JSONObject()
+                    .put("item1", "موقع تزايد مورد")
+                    .put("item2", "للبحرام"))
+                .put("buttons", new JSONObject()
+                    .put("telegram", new JSONObject()
+                        .put("text", "انضم للتليجرام")
+                        .put("color", "#0088CC")));
+        } catch (Exception e) {
+            return new JSONObject();
+        }
+    }
+
+    private void setupDialog(Context context, LinearLayout mainLayout, JSONObject config) {
+        try {
+            // 1. الخلفية الرئيسية
+            GradientDrawable background = new GradientDrawable();
+            background.setColor(Color.parseColor("#252F30"));
+            background.setCornerRadius(20f);
+            mainLayout.setBackground(background);
+
+            // 2. العنوان الرئيسي
+            TextView title = new TextView(context);
+            title.setText(config.optString("title", "تزايد مورد"));
+            title.setTextColor(Color.WHITE);
+            title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
+            title.setTypeface(null, Typeface.BOLD);
+            title.setGravity(Gravity.CENTER);
+            
+            LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            titleParams.setMargins(0, 0, 0, 20);
+            title.setLayoutParams(titleParams);
+            
+            mainLayout.addView(title);
+
+            // 3. الخط الفاصل
+            View divider = new View(context);
+            divider.setBackgroundColor(Color.parseColor("#3A4A4B"));
+            
+            LinearLayout.LayoutParams dividerParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                2
+            );
+            dividerParams.setMargins(0, 0, 0, 20);
+            divider.setLayoutParams(dividerParams);
+            
+            mainLayout.addView(divider);
+
+            // 4. النص التوضيحي
+            TextView description = new TextView(context);
+            description.setText(config.optString("description", ""));
+            description.setTextColor(Color.WHITE);
+            description.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+            description.setGravity(Gravity.CENTER);
+            description.setLineSpacing(10, 1);
+            
+            LinearLayout.LayoutParams descParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            descParams.setMargins(0, 0, 0, 30);
+            description.setLayoutParams(descParams);
+            
+            mainLayout.addView(description);
+
+            // 5. الجدول
+            JSONObject tableItems = config.optJSONObject("table_items");
+            if (tableItems != null) {
+                LinearLayout tableLayout = new LinearLayout(context);
+                tableLayout.setOrientation(LinearLayout.HORIZONTAL);
+                tableLayout.setGravity(Gravity.CENTER);
+                
+                // الخلية الأولى
+                TextView cellA = createTableCell(context, 
+                    tableItems.optString("item1", "موقع تزايد مورد"));
+                
+                // الخلية الثانية
+                TextView cellB = createTableCell(context, 
+                    tableItems.optString("item2", "للبحرام"));
+                
+                tableLayout.addView(cellA);
+                tableLayout.addView(cellB);
+                
+                LinearLayout.LayoutParams tableParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                tableParams.setMargins(0, 0, 0, 30);
+                tableLayout.setLayoutParams(tableParams);
+                
+                mainLayout.addView(tableLayout);
+            }
+
+            // 6. الأزرار
+            JSONObject buttons = config.optJSONObject("buttons");
+            if (buttons != null) {
+                JSONObject telegramBtn = buttons.optJSONObject("telegram");
+                if (telegramBtn != null) {
+                    Button btn = createButton(context, 
+                        telegramBtn.optString("text", "انضم للتليجرام"),
+                        telegramBtn.optString("color", "#0088CC"));
+                    
+                    btn.setOnClickListener(v -> {
+                        openLink(context, "https://t.me/your_channel");
+                    });
+                    
+                    mainLayout.addView(btn);
+                }
+            }
+
+        } catch (Exception e) {
+            Log.e("BadVip", "Error setting up dialog", e);
+        }
+    }
+
+    private TextView createTableCell(Context context, String text) {
+        TextView cell = new TextView(context);
+        cell.setText(text);
+        cell.setTextColor(Color.WHITE);
+        cell.setPadding(40, 20, 40, 20);
+        cell.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        
+        GradientDrawable border = new GradientDrawable();
+        border.setStroke(2, Color.WHITE);
+        border.setCornerRadius(8f);
+        cell.setBackground(border);
+        
+        return cell;
+    }
+
+    private Button createButton(Context context, String text, String color) {
+        Button btn = new Button(context);
+        btn.setText(text);
+        btn.setTextColor(Color.WHITE);
+        btn.setAllCaps(false);
+        btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        
+        GradientDrawable btnBg = new GradientDrawable();
+        btnBg.setColor(Color.parseColor(color));
+        btnBg.setCornerRadius(10f);
+        btn.setBackground(btnBg);
+        
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(0, 0, 0, 20);
+        btn.setLayoutParams(params);
+        
+        return btn;
+    }
+
+    private void openLink(Context context, String url) {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            context.startActivity(intent);
+        } catch (Exception e) {
+            Log.e("BadVip", "Failed to open link: " + url, e);
+        }
+    }
 }
