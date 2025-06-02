@@ -16,7 +16,7 @@
   },
   "buttons": {
     "cancel_button": {
-      "text": "Dismiss",
+      "text": "تخطي",
       "color": "#3A4A4B",
       "text_color": "#FFFFFF",
       "enabled": false
@@ -29,7 +29,7 @@
       "link": "https://linktr.ee/mano1420"
     },
     "join_telegram_button": {
-      "text": "Join Telegram",
+      "text": "تليجرام",
       "color": "#00BFFF",
       "text_color": "#FFFFFF",
       "enabled": true,
